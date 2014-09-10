@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+ <script type="text/javascript"  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMsXnD_yYGCfh3j5f8xlC8Vhksg6kSWD0"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	
+	<script src="maps.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	
+	
+	<title>Velo'v Predictor</title>
+
+
+<script>
+
+$(function () {
+  $('li>a').click(function(){
+    var pos = $($(this).attr('href')).offset().top-50;
+    $('body, html').animate({scrollTop:pos}, 1000);
+  })
+});
+</script> 
+
+<style>
+#map-canvas{
+height:420px;
+}
+
+
+#map-myChart{
+
+}
+
+<!--body {
+  padding-top: 50px;
+} -->
+.starter-template {
+  padding-top: 5px ;
+  background-color :#FFFFFF;
+ /* padding-top: 10px ;*/
+  /*paddind-15px;*/
+  
+  
+}
+
+#myChart
+{
+	padding-top : 15px;
+	
+}
+
+body{
+background-color :#EEEEEE;
+}
+#stat
+{
+margin-top : 8px;
+margin-left : 15px;
+padding : 5px 5px 5px 5px;
+font-size: 1.875em;
+/*
+border:1px solid black;*/
+}
+
+#map-canvas
+{
+margin-left : 15px;
+padding-right :20px;
+}
+
+.navbar-inverse { background-color: #E34DA7}
+.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus { background-color: #FA89EB}
+.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus { background-color: #F759B2}
+.dropdown-menu { background-color: #FFFFFF}
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus { background-color: #F759B2}
+.navbar-inverse { background-image: none; }
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus { background-image: none; }
+.navbar-inverse { border-color: #FFFFFF}
+.navbar-inverse .navbar-brand { color: #FFFFFF}
+.navbar-inverse .navbar-brand:hover { color: #FFFFFF}
+.navbar-inverse .navbar-nav>li>a { color: #FFFFFF}
+.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus { color: #FFFFFF}
+.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus { color: #FFFFFF}
+.navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus { color: #FFFFFF}
+.dropdown-menu>li>a { color: #000000}
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus { color: #FFFFFF}
+.navbar-inverse .navbar-nav>.dropdown>a .caret { border-top-color: #FFFFFF}
+.navbar-inverse .navbar-nav>.dropdown>a:hover .caret { border-top-color: #FFFFFF}
+.navbar-inverse .navbar-nav>.dropdown>a .caret { border-bottom-color: #FFFFFF}
+.navbar-inverse .navbar-nav>.dropdown>a:hover .caret { border-bottom-color: #FFFFFF}
+.navbar-inverse .navbar-toggle {
+border-color: #FFFFFF;
+}
+.navbar-inverse .navbar-toggle:hover {
+background-color: #FFFFFF;
+}
+
+
+
+
+
+
+</style>
+</head>
+<body  >
+
+<div class="navbar-inverse navbar-fixed-top" role="banner">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse"  data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Velo'v Predictor</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav" role ="tablist">
+            <li id="btncarte"><a href="#map-canvas">Carte</a></li>
+            <li><a href="#stat">Stats</a></li>
+            <li><a href="#myChart">Previsions</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+ </div>
+	
+	<div class="container  starter-template">
+		
+	<div class="row  ">
+		<div id="map-canvas" class="col-md-8"></div>
+		<div id="stat" class="col-md-3" >
+			<span id="nom" ></span><br />
+			<span id="nbvelos" ></span><br />
+			<span id="nbplaces" ></span><br />
+		</div>
+
+	</div>
+	
+
+	<div class="row">		
+		<div id="myChart" style="width:100%; height:400px;"></div>
+	</div>	
+	</div>
+	
+    <div id="scriptxt"></div>
+
+<script>
+var stockholm = new google.maps.LatLng(45.743317, 4.815747);
+var parliament = new google.maps.LatLng(45.743317, 4.815747);
+var marker;
+var map;
+
+function initialize() {
+  var mapOptions = {
+    zoom: 13,
+    center: stockholm
+  };
+
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+          mapOptions);
+
+
+google.maps.event.addDomListener(window, 'load', initialize);
+}
+
+function chager(id)
+{
+ jQuery.ajax({
+  type: 'GET', // Le type de ma requete
+  url: 'indexchart.php?id='+id, // L'url vers laquelle la requete sera envoyee
+  success: function(data, textStatus, jqXHR) {
+  //alert(data);
+  $("#scriptxt").html(data);
+    // La reponse du serveur est contenu dans data
+    // On peut faire ce qu'on veut avec ici
+  },
+  error: function(jqXHR, textStatus, errorThrown) {
+    // Une erreur s'est produite lors de la requete
+  }
+});
+
+}
+
+
+
+</script>
+</body>
+</HTML>
